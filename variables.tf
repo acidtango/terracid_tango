@@ -1,5 +1,14 @@
 data "aws_availability_zones" "available" {}
 
+data "aws_acm_certificate" "default" {
+  domain      = "${var.site_name}"
+  most_recent = true
+}
+
+variable "site_name" {
+  description = "The DNS domain name of the site"
+}
+
 variable "aws_credentials_file" {
   type        = "string"
   description = "Location of the AWS credentials file"
