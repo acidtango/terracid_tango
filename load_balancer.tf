@@ -29,15 +29,33 @@ resource "aws_lb" "public_lb" {
 
 resource "aws_lb_target_group" "ec2_tg" {
   name     = "Terraform-EC2-TargetGroup"
-  port     = 80
-  protocol = "HTTP"
+  port     = 443
+  protocol = "HTTPS"
   vpc_id   = "${aws_vpc.main.id}"
 }
 
 resource "aws_lb_listener" "port_80_listener" {
   load_balancer_arn = "${aws_lb.public_lb.arn}"
-  port              = "80"
+  port              = 80
   protocol          = "HTTP"
+
+  default_action {
+    type = "redirect"
+
+    redirect {
+      port        = 443
+      protocol    = "HTTPS"
+      status_code = "HTTP_301"
+    }
+  }
+}
+
+resource "aws_lb_listener" "port_443_listener" {
+  load_balancer_arn = "${aws_lb.public_lb.arn}"
+  port              = 443
+  protocol          = "HTTPS"
+  ssl_policy        = "TODO"
+  certificate_arn   = "TODO"
 
   default_action {
     type             = "forward"
