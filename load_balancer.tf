@@ -29,8 +29,8 @@ resource "aws_lb" "public_lb" {
 
 resource "aws_lb_target_group" "ec2_tg" {
   name     = "Terraform-EC2-TargetGroup"
-  port     = 443
-  protocol = "HTTPS"
+  port     = 80
+  protocol = "HTTP"
   vpc_id   = "${aws_vpc.main.id}"
 }
 
@@ -54,7 +54,7 @@ resource "aws_lb_listener" "port_443_listener" {
   load_balancer_arn = "${aws_lb.public_lb.arn}"
   port              = 443
   protocol          = "HTTPS"
-  ssl_policy        = "TODO"
+  ssl_policy        = "ELBSecurityPolicy-2016-08"
   certificate_arn   = "TODO"
 
   default_action {
