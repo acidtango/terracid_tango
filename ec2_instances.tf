@@ -20,36 +20,108 @@ resource "aws_security_group" "ec2_host_sg" {
   }
 }
 
-resource "aws_instance" "ec2_host1" {
-  ami                    = "${lookup(var.rancher_amis, var.aws_region)}"
-  subnet_id              = "${aws_subnet.private_subnet_1.id}"
-  vpc_security_group_ids = ["${aws_security_group.ec2_host_sg.id}"]
+resource "aws_launch_template" "swarm_managers" {
+  name = "swarm_managers"
+
+  image_id               = "${lookup(var.rancher_amis, var.aws_region)}"
   instance_type          = "t2.micro"
   key_name               = "${var.aws_key_name}"
+  vpc_security_group_ids = ["${aws_security_group.ec2_host_sg.id}"]
 
-  tags {
-    Name = "EC2 Example Host"
+  # Ensure the managers are not terminated by accident
+  disable_api_termination = true
+
+  # Tags added to the created Instances
+  tag_specifications {
+    resource_type = "instance"
+
+    tags = {
+      Name = "Swarm Manager"
+    }
+  }
+
+  iam_instance_profile {
+    name = "${aws_iam_instance_profile.ec2_profile.name}"
+  }
+
+  block_device_mappings {
+    device_name = "/dev/sda1"
+
+    ebs {
+      volume_size = 10 # In GB
+    }
+  }
+
+  # This is used to run on instance initialization
+  user_data = "${base64encode("${var.swarm_managers_user_data}")}"
+}
+
+resource "aws_autoscaling_group" "swarm_managers_asg" {
+  name = "swarm-managers-asg"
+
+  # Don't change the number of instances until terraform-providers/terraform-provider-aws#23 is solved
+  max_size                  = 3
+  min_size                  = 1
+  desired_capacity          = 1
+  health_check_grace_period = 300
+  force_delete              = false
+  vpc_zone_identifier       = ["${aws_subnet.private_subnet_1.id}", "${aws_subnet.private_subnet_2.id}"]
+  target_group_arns         = ["${aws_lb_target_group.ec2_tg.arn}"]
+
+  launch_template {
+    id      = "${aws_launch_template.swarm_managers.id}"
+    version = "$$Latest"
   }
 }
 
-resource "aws_instance" "ec2_host2" {
-  ami                    = "${lookup(var.rancher_amis, var.aws_region)}"
-  subnet_id              = "${aws_subnet.private_subnet_2.id}"
-  vpc_security_group_ids = ["${aws_security_group.ec2_host_sg.id}"]
-  instance_type          = "t2.micro"
-  key_name               = "${var.aws_key_name}"
+# resource "aws_launch_template" "swarm_workers" {
+#   name = "swarm_workers"
 
-  tags {
-    Name = "EC2 Example Host"
-  }
-}
+#   image_id               = "${lookup(var.rancher_amis, var.aws_region)}"
+#   instance_type          = "t2.micro"
+#   key_name               = "${var.aws_key_name}"
+#   vpc_security_group_ids = ["${aws_security_group.ec2_host_sg.id}"]
 
-resource "aws_lb_target_group_attachment" "attachment_1" {
-  target_group_arn = "${aws_lb_target_group.ec2_tg.arn}"
-  target_id        = "${aws_instance.ec2_host1.id}"
-}
+#   # Ensure the workers are not terminated by accident
+#   disable_api_termination = true
 
-resource "aws_lb_target_group_attachment" "attachment_2" {
-  target_group_arn = "${aws_lb_target_group.ec2_tg.arn}"
-  target_id        = "${aws_instance.ec2_host2.id}"
-}
+#   # Tags added to the created Instances
+#   tag_specifications {
+#     resource_type = "instance"
+
+#     tags = {
+#       Name = "Swarm Worker"
+#     }
+#   }
+
+#   iam_instance_profile {
+#     name = "${aws_iam_instance_profile.ec2_profile.name}"
+#   }
+
+#   block_device_mappings {
+#     device_name = "/dev/sda1"
+
+#     ebs {
+#       volume_size = 10 # In GB
+#     }
+#   }
+
+#   # This is used to run on instance initialization
+#   user_data = "${base64encode("${var.swarm_workers_user_data}")}"
+# }
+
+# resource "aws_autoscaling_group" "swarm_workers_asg" {
+#   name                      = "swarm-workers-asg"
+#   max_size                  = 3
+#   min_size                  = 1
+#   desired_capacity          = 1
+#   health_check_grace_period = 300
+#   force_delete              = false
+#   vpc_zone_identifier       = ["${aws_subnet.private_subnet_1.id}", "${aws_subnet.private_subnet_2.id}"]
+#   target_group_arns         = ["${aws_lb_target_group.ec2_tg.arn}"]
+
+#   launch_template {
+#     id      = "${aws_launch_template.swarm_workers.id}"
+#     version = "$$Latest"
+#   }
+# }

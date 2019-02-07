@@ -1,9 +1,9 @@
 data "aws_availability_zones" "available" {}
 
-data "aws_acm_certificate" "default" {
-  domain      = "${var.site_name}"
-  most_recent = true
-}
+# data "aws_acm_certificate" "default" {
+#   domain      = "${var.site_name}"
+#   most_recent = true
+# }
 
 variable "site_name" {
   description = "The DNS domain name of the site"
@@ -97,3 +97,33 @@ variable "private_subnet_2_cidr" {
   description = "CIDR for the Private Subnet 2"
   default     = "10.0.102.0/24"
 }
+
+# variable "swarm_managers_user_data" {
+#   default = <<EOF
+# #cloud-config
+# rancher:
+# write_files:
+#   - path: /etc/rc.local
+#     permissions: "0755"
+#     owner: root
+#     content: |
+#       #!/bin/bash
+#       wait-for-docker
+#       docker swarm join --token SWMTKN-1-2dqfz6c93l37qoh3smavu2lkpa2kwveqau5s9mm3ivel8iyx22-7f7l91bjq50e8o6cy949l7xas 10.0.101.241:2377
+# EOF
+# }
+
+# variable "swarm_workers_user_data" {
+#   default = <<EOF
+# #cloud-config
+# rancher:
+# write_files:
+#   - path: /etc/rc.local
+#     permissions: "0755"
+#     owner: root
+#     content: |
+#       #!/bin/bash
+#       wait-for-docker
+#       docker swarm join --token SWMTKN-1-2dqfz6c93l37qoh3smavu2lkpa2kwveqau5s9mm3ivel8iyx22-7600m65hpe1pgguqn38nlgozc 10.0.101.241:2377
+# EOF
+# }
