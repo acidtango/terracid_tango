@@ -55,7 +55,7 @@ resource "aws_lb_listener" "port_443_listener" {
   port              = 443
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-2016-08"
-  certificate_arn   = "TODO"
+  certificate_arn   = "${aws_acm_certificate.default.arn}"
 
   default_action {
     type             = "forward"

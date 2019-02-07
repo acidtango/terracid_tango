@@ -6,3 +6,6 @@ aws_key_name = "your-aws-key"
 
 # AWS CLI profile to use. Defaults to 'default'.
 aws_cli_profile = "your-profile"
+
+# The DNS domain name of the site
+site_name = "*.example.com"
