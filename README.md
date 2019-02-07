@@ -27,16 +27,30 @@ go to the [AWS Provider Documentation](https://www.terraform.io/docs/providers/a
 
 ## Usage
 
-After cloning the repo, create a file called `terraform.tfvars` with your specific credentials:
-```
-aws_credentials_file = "~/.aws/credentials"
-aws_key_name = "your-aws-key"
-aws_cli_profile = "some_profile"
-```
-- `aws_credentials_file`: the file where your AWS credentials are stored.
-- `aws_key_name`: the ssh key pair used to create the EC2 instances.
-- `aws_cli_profile`: the aws-cli profile to use to use. Defaults to `default`.
+Clone the repository
 
+```sh
+git clone git@github.com:acidtango/terracid_tango.git
+```
+
+Rename the `terraform.tfvars.example` file to be `terraform.tfvars`:
+
+```sh
+mv terraform.tfvars.example terraform.tfvars
+```
+
+Modify the file to use your specific credentials:
+
+```
+# File where your AWS credentials are stored
+aws_credentials_file = "~/.aws/credentials"
+
+# SSH key pair used to create the EC2 instances.
+aws_key_name = "your-aws-key"
+
+# AWS CLI profile to use. Defaults to 'default'.
+aws_cli_profile = "your-profile"
+```
 
 Initialize terraform
 ```

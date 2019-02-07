@@ -36,7 +36,7 @@ resource "aws_subnet" "public_subnet_1" {
   vpc_id                  = "${aws_vpc.main.id}"
   cidr_block              = "${var.public_subnet_1_cidr}"
   map_public_ip_on_launch = true
-  availability_zone = "${data.aws_availability_zones.available.names[0]}"
+  availability_zone       = "${data.aws_availability_zones.available.names[0]}"
 
   tags {
     Name = "Terraform - Public Subnet 1"
@@ -48,7 +48,7 @@ resource "aws_subnet" "public_subnet_2" {
   vpc_id                  = "${aws_vpc.main.id}"
   cidr_block              = "${var.public_subnet_2_cidr}"
   map_public_ip_on_launch = true
-  availability_zone = "${data.aws_availability_zones.available.names[1]}"
+  availability_zone       = "${data.aws_availability_zones.available.names[1]}"
 
   tags {
     Name = "Terraform - Public Subnet 2"
@@ -80,8 +80,8 @@ resource "aws_route_table_association" "public_subnet_2" {
 
 # Private Subnet 1
 resource "aws_subnet" "private_subnet_1" {
-  vpc_id     = "${aws_vpc.main.id}"
-  cidr_block = "${var.private_subnet_1_cidr}"
+  vpc_id            = "${aws_vpc.main.id}"
+  cidr_block        = "${var.private_subnet_1_cidr}"
   availability_zone = "${data.aws_availability_zones.available.names[0]}"
 
   tags {
@@ -91,8 +91,8 @@ resource "aws_subnet" "private_subnet_1" {
 
 # Private Subnet 2
 resource "aws_subnet" "private_subnet_2" {
-  vpc_id     = "${aws_vpc.main.id}"
-  cidr_block = "${var.private_subnet_2_cidr}"
+  vpc_id            = "${aws_vpc.main.id}"
+  cidr_block        = "${var.private_subnet_2_cidr}"
   availability_zone = "${data.aws_availability_zones.available.names[1]}"
 
   tags {

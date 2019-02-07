@@ -1,4 +1,3 @@
-
 resource "aws_security_group" "lb_sg" {
   name        = "ALB_SG"
   description = "Security Group for ALB"
