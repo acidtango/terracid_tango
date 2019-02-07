@@ -22,7 +22,7 @@ resource "aws_eip" "nat_gw_ip" {
 
 resource "aws_nat_gateway" "nat_gw" {
   allocation_id = "${aws_eip.nat_gw_ip.id}"
-  subnet_id     = "${aws_subnet.public_subnet2.id}"
+  subnet_id     = "${aws_subnet.public_subnet_2.id}"
 
   depends_on = ["aws_internet_gateway.main"]
 
@@ -32,9 +32,9 @@ resource "aws_nat_gateway" "nat_gw" {
 }
 
 # Public subnet 1
-resource "aws_subnet" "public_subnet1" {
+resource "aws_subnet" "public_subnet_1" {
   vpc_id                  = "${aws_vpc.main.id}"
-  cidr_block              = "${var.public_subnet1_cidr}"
+  cidr_block              = "${var.public_subnet_1_cidr}"
   map_public_ip_on_launch = true
   availability_zone = "${data.aws_availability_zones.available.names[0]}"
 
@@ -44,9 +44,9 @@ resource "aws_subnet" "public_subnet1" {
 }
 
 # Public subnet 2
-resource "aws_subnet" "public_subnet2" {
+resource "aws_subnet" "public_subnet_2" {
   vpc_id                  = "${aws_vpc.main.id}"
-  cidr_block              = "${var.public_subnet2_cidr}"
+  cidr_block              = "${var.public_subnet_2_cidr}"
   map_public_ip_on_launch = true
   availability_zone = "${data.aws_availability_zones.available.names[1]}"
 
@@ -69,19 +69,19 @@ resource "aws_default_route_table" "public_route_table" {
 }
 
 resource "aws_route_table_association" "public_subnet_1" {
-  subnet_id      = "${aws_subnet.public_subnet1.id}"
+  subnet_id      = "${aws_subnet.public_subnet_1.id}"
   route_table_id = "${aws_vpc.main.default_route_table_id}"
 }
 
 resource "aws_route_table_association" "public_subnet_2" {
-  subnet_id      = "${aws_subnet.public_subnet2.id}"
+  subnet_id      = "${aws_subnet.public_subnet_2.id}"
   route_table_id = "${aws_vpc.main.default_route_table_id}"
 }
 
 # Private Subnet 1
-resource "aws_subnet" "private_subnet1" {
+resource "aws_subnet" "private_subnet_1" {
   vpc_id     = "${aws_vpc.main.id}"
-  cidr_block = "${var.private_subnet1_cidr}"
+  cidr_block = "${var.private_subnet_1_cidr}"
   availability_zone = "${data.aws_availability_zones.available.names[0]}"
 
   tags {
@@ -90,9 +90,9 @@ resource "aws_subnet" "private_subnet1" {
 }
 
 # Private Subnet 2
-resource "aws_subnet" "private_subnet2" {
+resource "aws_subnet" "private_subnet_2" {
   vpc_id     = "${aws_vpc.main.id}"
-  cidr_block = "${var.private_subnet2_cidr}"
+  cidr_block = "${var.private_subnet_2_cidr}"
   availability_zone = "${data.aws_availability_zones.available.names[1]}"
 
   tags {
@@ -114,11 +114,11 @@ resource "aws_route_table" "private_route_table" {
 }
 
 resource "aws_route_table_association" "private_subnet_1" {
-  subnet_id      = "${aws_subnet.private_subnet1.id}"
+  subnet_id      = "${aws_subnet.private_subnet_1.id}"
   route_table_id = "${aws_route_table.private_route_table.id}"
 }
 
 resource "aws_route_table_association" "private_subnet_2" {
-  subnet_id      = "${aws_subnet.private_subnet2.id}"
+  subnet_id      = "${aws_subnet.private_subnet_2.id}"
   route_table_id = "${aws_route_table.private_route_table.id}"
 }

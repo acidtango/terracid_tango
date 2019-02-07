@@ -25,7 +25,7 @@ resource "aws_lb" "public_lb" {
   internal           = false
   load_balancer_type = "application"
   security_groups    = ["${aws_security_group.lb_sg.id}"]
-  subnets            = ["${aws_subnet.public_subnet1.id}", "${aws_subnet.public_subnet2.id}"]
+  subnets            = ["${aws_subnet.public_subnet_1.id}", "${aws_subnet.public_subnet_2.id}"]
 }
 
 resource "aws_lb_target_group" "ec2_tg" {
