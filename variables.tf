@@ -8,7 +8,7 @@ variable "aws_credentials_file" {
 variable "aws_cli_profile" {
   type        = "string"
   description = "AWS profile to use"
-  default = "default"
+  default     = "default"
 }
 
 variable "aws_region" {
