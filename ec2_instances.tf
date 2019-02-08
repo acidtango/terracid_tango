@@ -53,7 +53,7 @@ resource "aws_launch_template" "swarm_managers" {
   }
 
   # This is used to run on instance initialization
-  user_data = "${base64encode("${var.swarm_managers_user_data}")}"
+  user_data = "${base64encode("${var.swarm_managers_init_user_data}")}"
 }
 
 resource "aws_autoscaling_group" "swarm_managers_asg" {
