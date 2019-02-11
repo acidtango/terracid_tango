@@ -53,23 +53,67 @@ aws_cli_profile = "your-profile"
 ```
 
 Initialize terraform
-```
+```sh
 $ terraform init
 ```
 
 If everything is correct the following command should output an execution plan
-```
+```sh
 $ terraform plan
 ```
 
-To create the infraestructure
-```
+### First apply - Swarm Initialization
+
+Execute the infrastructure
+```sh
 $ terraform apply
 ```
 
-To reverse everything
+If everything goes right, you should found one instace called `Swarm Manager` in the EC2 dashboard.
+This instance will be the Swarm Manager Leader, and after a few moments it should be ready to accept
+new nodes.
+
+### Second apply - Configure AutoScalingGroups
+
+Connect to the instance (trough the Bastion Host) and verify that the Swarm is initialized
+
+```sh
+$ docker node ls
+
+ID                            HOSTNAME                STATUS              AVAILABILITY        MANAGER STATUS      ENGINE VERSION
+zwqenokj41vl3oho7ulv3d2bp *   example-hostname        Ready               Active              Leader              18.09.1
 ```
-$ terraform destroy
+
+Still inside the instance, get the Manager command
+```sh
+$ docker swarm join-token manager
+
+To add a manager to this swarm, run the following command:
+
+    docker swarm join --token SWMTKN-1-3h7hxv9sf9arjkk1np1uz37pwmpyts7jndktfrscycl3h4k98z-examplemanagertoken 10.0.1.123:2377
+```
+
+And get the Worker command
+```sh
+$ docker swarm join-token worker
+
+To add a worker to this swarm, run the following command:
+
+    docker swarm join --token SWMTKN-1-3h7hxv9sf9arjkk1np1uz37pwmpyts7jndktfrscycl3h4k98z-exampleworkertoken 10.0.1.123:2377
+```
+
+Copy both commands and add them in the `variables.tf` file, in the `swarm_managers_user_data` and
+`swarm_workers_user_data`
+
+Next, go to the `ec2_instances.tf` file. Go to the block `resource "aws_launch_template" "swarm_managers"`,
+and change the `user_data` key from `"${base64encode("${var.swarm_managers_init_user_data}")}"` to
+`"${base64encode("${var.swarm_managers_user_data}")}"`. Finally, uncomment the two commented blocks
+in the end of the file.
+
+After all this changes are done, apply the infrastructure once again
+
+```sh
+$ terraform apply
 ```
 
 ## Testing your deployment
@@ -87,39 +131,11 @@ Outputs:
   alb_dns_name = some.dns.name
 ```
 
-To test the infrastructure, connect through the bastion host into the EC2 instances in the private
-network and deploy any service that responds in the port 80. With the RancherOS instances you could
-run an [echo server](https://hub.docker.com/r/inanimate/echo-server)
+Connect to that address in a browser and you should see the [Swarmpit](https://swarmpit.io/). Log
+in with `admin/admin` and you should see information about your nodes.
 
-```
-$ docker run -d -p 80:8080 inanimate/echo-server
-```
+If you want to bring down the infraestructure
 
-Once that is done make an HTTP request to the Load Balancer Address. The response should be something
-similar to this
-```
-$ curl some.dns.name
-
-Welcome to echo-server!  Here's what I know.
-  > Head to /ws for interactive websocket echo!
-
--> My hostname is: echo-server-4282639374-6bvzg
-
--> My Pod Name is: echo-server-4282639374-6bvzg
--> My Pod Namespace is: playground
--> My Pod IP is: 10.2.1.30
-
--> Requesting IP: 10.2.2.0:40974
-
--> TLS Connection Info |
-
-  &{Version:771 HandshakeComplete:true DidResume:false CipherSuite:52392 NegotiatedProtocol:h2 NegotiatedProtocolIsMutual:true ServerName:echo.arroyo.io PeerCertificates:[] VerifiedChains:[] SignedCertificateTimestamps:[] OCSPResponse:[] TLSUnique:[208 42 212 243 141 165 4 35 226 40 176 84]}
-
--> Request Headers |
-
-  HTTP/1.1 GET /
-
-  Host: example.com
-  Accept-Encoding: gzip, d
-  ....
+```sh
+terraform destroy
 ```
