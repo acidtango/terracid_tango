@@ -132,7 +132,7 @@ Outputs:
 ```
 
 Connect to that address in a browser and you should see the [Swarmpit](https://swarmpit.io/). Log
-in with `admin/admin` and you shoul see information about your nodes.
+in with `admin/admin` and you should see information about your nodes.
 
 If you want to bring down the infraestructure
 
