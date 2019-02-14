@@ -119,7 +119,7 @@ write_files:
       shopt -s expand_aliases
       alias git="docker run -ti --rm -v $(pwd):/git bwits/docker-git-alpine"
       git clone https://github.com/acidtango/swarm_init
-      docker network create -d overlay webgateway
+      docker network create -d overlay traefik-net
       DOMAIN_NAME=${var.site_name} docker stack deploy -c swarm_init/docker-compose.yml infrastructure
       echo -e "\n====== MANAGER TOKEN ======"
       docker swarm join-token manager
