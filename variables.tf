@@ -1,7 +1,7 @@
 data "aws_availability_zones" "available" {}
 
 # data "aws_acm_certificate" "default" {
-#   domain      = "${var.site_name}"
+#   domain      = "*.${var.site_name}"
 #   most_recent = true
 # }
 
@@ -98,8 +98,8 @@ variable "private_subnet_2_cidr" {
   default     = "10.0.102.0/24"
 }
 
-variable "swarm_managers_init_user_data" {
-  default = <<EOF
+locals {
+  swarm_managers_init_user_data = <<EOF
 #cloud-config
 rancher:
 write_files:
@@ -109,17 +109,28 @@ write_files:
     content: |
       #!/bin/bash
       wait-for-docker
-      alias git="docker run -ti --rm -v $(pwd):/git bwits/docker-git-alpine"
       docker swarm init
-      git clone https://github.com/swarmpit/swarmpit -b 1.5.1
-      sed -i 's/888/80/' swarmpit/docker-compose.yml
-      docker stack deploy -c swarmpit/docker-compose.yml swarmpit
-EOF
-}
 
-variable "swarm_managers_user_data" {
+  - path: /home/rancher/cluster-init.sh
+    permissions: "0711"
+    owner: rancher
+    content: |
+      #!/bin/bash
+      shopt -s expand_aliases
+      alias git="docker run -ti --rm -v $(pwd):/git bwits/docker-git-alpine"
+      git clone https://github.com/acidtango/swarm_init
+      docker network create -d overlay traefik-net
+      DOMAIN_NAME=${var.site_name} docker stack deploy -c swarm_init/docker-compose.yml infrastructure
+      echo -e "\n====== MANAGER TOKEN ======"
+      docker swarm join-token manager
+      echo -e "===========================\n"
+      echo -e "\n====== WORKER  TOKEN ======"
+      docker swarm join-token worker
+      echo -e "===========================\n"
+EOF
+
   # NOTE: change the docker join command to use the token for MANAGERS
-  default = <<EOF
+  swarm_managers_user_data = <<EOF
 #cloud-config
 rancher:
 write_files:
@@ -131,11 +142,9 @@ write_files:
       wait-for-docker
       docker swarm join <<FILL IN THE REST OF THE COMMAND. SEE README>>
 EOF
-}
 
-variable "swarm_workers_user_data" {
   # NOTE: change the docker join command to use the token for WORKERS
-  default = <<EOF
+  swarm_workers_user_data = <<EOF
 #cloud-config
 rancher:
 write_files:

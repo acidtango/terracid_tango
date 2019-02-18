@@ -8,4 +8,4 @@ aws_key_name = "your-aws-key"
 aws_cli_profile = "your-profile"
 
 # The DNS domain name of the site
-site_name = "*.example.com"
+site_name = "example.com"

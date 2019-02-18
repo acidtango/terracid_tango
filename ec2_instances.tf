@@ -53,13 +53,11 @@ resource "aws_launch_template" "swarm_managers" {
   }
 
   # This is used to run on instance initialization
-  user_data = "${base64encode("${var.swarm_managers_init_user_data}")}"
+  user_data = "${base64encode("${local.swarm_managers_init_user_data}")}"
 }
 
 resource "aws_autoscaling_group" "swarm_managers_asg" {
   name = "swarm-managers-asg"
-
-  # Don't change the number of instances until terraform-providers/terraform-provider-aws#23 is solved
   max_size                  = 3
   min_size                  = 1
   desired_capacity          = 1
@@ -107,7 +105,7 @@ resource "aws_autoscaling_group" "swarm_managers_asg" {
 #   }
 
 #   # This is used to run on instance initialization
-#   user_data = "${base64encode("${var.swarm_workers_user_data}")}"
+#   user_data = "${base64encode("${local.swarm_workers_user_data}")}"
 # }
 
 # resource "aws_autoscaling_group" "swarm_workers_asg" {

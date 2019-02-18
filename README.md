@@ -75,39 +75,61 @@ new nodes.
 
 ### Second apply - Configure AutoScalingGroups
 
-Connect to the instance (trough the Bastion Host) and verify that the Swarm is initialized
+Connect to the instance (trough the Bastion Host) and verify that the Swarm is initialized and that
+there is a script called `cluster-init.sh` created in `/home/rancher`
 
 ```sh
 $ docker node ls
 
 ID                            HOSTNAME                STATUS              AVAILABILITY        MANAGER STATUS      ENGINE VERSION
 zwqenokj41vl3oho7ulv3d2bp *   example-hostname        Ready               Active              Leader              18.09.1
+
+$ ls -l /home/rancher
+
+total 4
+-rwx--x--x    1 rancher  root           517 Feb 13 10:41 cluster-init.sh
 ```
 
-Still inside the instance, get the Manager command
-```sh
-$ docker swarm join-token manager
+This script uses the [Swarm init](https://github.com/acidtango/swarm_init) compose file to deploy
+[Traefik](https://docs.traefik.io/) and [Swarmpit](https://swarmpit.io/) in our cluster.
 
+Run the script and take note of the tokens for the managers and the workers.
+
+```
+$ ./cluster-init.sh
+Unable to find image 'bwits/docker-git-alpine:latest' locally
+latest: Pulling from bwits/docker-git-alpine
+...
+Cloning into 'swarm_init'...
+...
+Creating network infrastructure_net
+Creating service infrastructure_swarmpit
+Creating service infrastructure_swarmpit_db
+Creating service infrastructure_swarmpit_agent
+Creating service infrastructure_traefik
+
+====== MANAGER TOKEN ======
 To add a manager to this swarm, run the following command:
 
-    docker swarm join --token SWMTKN-1-3h7hxv9sf9arjkk1np1uz37pwmpyts7jndktfrscycl3h4k98z-examplemanagertoken 10.0.1.123:2377
-```
+    docker swarm join --token SWMTKN-1-3x.. # Rest of the manager token
 
-And get the Worker command
-```sh
-$ docker swarm join-token worker
+===========================
 
+
+====== WORKER  TOKEN ======
 To add a worker to this swarm, run the following command:
 
-    docker swarm join --token SWMTKN-1-3h7hxv9sf9arjkk1np1uz37pwmpyts7jndktfrscycl3h4k98z-exampleworkertoken 10.0.1.123:2377
+    docker swarm join --token SWMTKN-1-3x.. # Rest of the worker token
+
+===========================
 ```
 
 Copy both commands and add them in the `variables.tf` file, in the `swarm_managers_user_data` and
 `swarm_workers_user_data`
 
 Next, go to the `ec2_instances.tf` file. Go to the block `resource "aws_launch_template" "swarm_managers"`,
-and change the `user_data` key from `"${base64encode("${var.swarm_managers_init_user_data}")}"` to
-`"${base64encode("${var.swarm_managers_user_data}")}"`. Finally, uncomment the two commented blocks
+and change the `user_data` key from `"${base64encode("${local.swarm_managers_init_user_data}")}"` to
+`"${base64encode("${local.swarm_managers_user_data}")}"`. Finally, uncomment the two commented blocks
 in the end of the file.
 
 After all this changes are done, apply the infrastructure once again
@@ -131,10 +153,14 @@ Outputs:
   alb_dns_name = some.dns.name
 ```
 
-Connect to that address in a browser and you should see the [Swarmpit](https://swarmpit.io/). Log
-in with `admin/admin` and you should see information about your nodes.
+Make sure that both `traefik.your-domain.com` and `swarmpit.your-domain.com` resolve to the
+load balancer address.
 
-If you want to bring down the infraestructure
+After a few moments, connecting to `traefik.your-domain.com` should show the Traefik dashboard
+and `swarmpit.your-domain.com` should show you the swarmpit dashboard (default credentials are
+`admin`/`admin`).
+
+If you want to bring down the infrastructure
 
 ```sh
 terraform destroy
