@@ -1,11 +1,11 @@
 # File where your AWS credentials are stored
 aws_credentials_file = "~/.aws/credentials"
 
-# SSH key pair used to create the EC2 instances.
-aws_key_name = "your-aws-key"
-
 # AWS CLI profile to use. Defaults to 'default'.
 aws_cli_profile = "your-profile"
+
+# SSH key pair used to create the EC2 instances.
+aws_key_name = "your-aws-key"
 
 # The DNS domain name of the site
 site_name = "*.example.com"

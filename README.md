@@ -20,6 +20,7 @@ to http port 80 to the EC2 instances.
 
 - AWS Credentials File ([link](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html))
 - terraform ([link](https://www.terraform.io/downloads.html))
+- Create a ssh-key in your AWS account
 
 For more info on how Terraform works visit the [Getting Starte Guide](https://learn.hashicorp.com/terraform/getting-started/install.html)
 and the [Docs](https://www.terraform.io/docs). For more specific information about AWS resources
