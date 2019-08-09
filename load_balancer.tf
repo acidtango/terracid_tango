@@ -69,3 +69,8 @@ resource "aws_lb_listener" "port_80_listener" {
 #     target_group_arn = "${aws_lb_target_group.ec2_tg.arn}"
 #   }
 # }
+
+resource "aws_acm_certificate" "default" {
+  domain_name       = "${var.site_name}"
+  validation_method = "DNS"
+}
