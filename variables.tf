@@ -1,16 +1,17 @@
-data "aws_availability_zones" "available" {}
+data "aws_availability_zones" "available" {
+}
 
 variable "site_name" {
   description = "The DNS domain name of the site"
 }
 
 variable "aws_credentials_file" {
-  type        = "string"
+  type        = string
   description = "Location of the AWS credentials file"
 }
 
 variable "aws_cli_profile" {
-  type        = "string"
+  type        = string
   description = "AWS profile to use"
   default     = "default"
 }
@@ -21,7 +22,7 @@ variable "aws_region" {
 }
 
 variable "aws_key_name" {
-  type        = "string"
+  type        = string
   description = "Desired name of AWS key pair"
 }
 
@@ -129,6 +130,7 @@ write_files:
       echo -e "===========================\n"
 EOF
 
+
   # NOTE: change the docker join command to use the token for MANAGERS
   swarm_managers_user_data = <<EOF
 #cloud-config
@@ -143,6 +145,7 @@ write_files:
       docker swarm join <<FILL IN THE REST OF THE COMMAND. SEE README>>
 EOF
 
+
   # NOTE: change the docker join command to use the token for WORKERS
   swarm_workers_user_data = <<EOF
 #cloud-config
@@ -156,4 +159,6 @@ write_files:
       wait-for-docker
       docker swarm join <<FILL IN THE REST OF THE COMMAND. SEE README>>
 EOF
+
 }
+
