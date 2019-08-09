@@ -1,16 +1,17 @@
-data "aws_availability_zones" "available" {}
+data "aws_availability_zones" "available" {
+}
 
 variable "site_name" {
   description = "The DNS domain name of the site"
 }
 
 variable "aws_credentials_file" {
-  type        = "string"
+  type        = string
   description = "Location of the AWS credentials file"
 }
 
 variable "aws_cli_profile" {
-  type        = "string"
+  type        = string
   description = "AWS profile to use"
   default     = "default"
 }
@@ -21,7 +22,7 @@ variable "aws_region" {
 }
 
 variable "aws_key_name" {
-  type        = "string"
+  type        = string
   description = "Desired name of AWS key pair"
 }
 
@@ -97,3 +98,4 @@ variable "private_subnet_2_cidr" {
   description = "CIDR for the Private Subnet 2"
   default     = "10.0.102.0/24"
 }
+
