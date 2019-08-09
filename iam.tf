@@ -13,12 +13,13 @@ resource "aws_iam_role" "ec2_host_role" {
   }]
 }
 EOF
+
 }
 
 # This policy is needed for the containers to be able to write in CloudWatch
 resource "aws_iam_role_policy" "logs_policy" {
   name = "logs_policy"
-  role = "${aws_iam_role.ec2_host_role.id}"
+  role = aws_iam_role.ec2_host_role.id
 
   policy = <<EOF
 {
@@ -35,9 +36,11 @@ resource "aws_iam_role_policy" "logs_policy" {
   ]
 }
 EOF
+
 }
 
 resource "aws_iam_instance_profile" "ec2_profile" {
   name = "ec2_profile"
-  role = "${aws_iam_role.ec2_host_role.name}"
+  role = aws_iam_role.ec2_host_role.name
 }
+
