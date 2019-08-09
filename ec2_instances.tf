@@ -74,10 +74,10 @@ resource "aws_autoscaling_group" "swarm_managers_asg" {
 
 # resource "aws_launch_template" "swarm_workers" {
 #   name = "swarm_workers"
-#   image_id               = "${lookup(var.rancher_amis, var.aws_region)}"
+#   image_id               = var.rancher_amis[var.aws_region]
 #   instance_type          = "t2.micro"
-#   key_name               = "${var.aws_key_name}"
-#   vpc_security_group_ids = ["${aws_security_group.ec2_host_sg.id}"]
+#   key_name               = var.aws_key_name
+#   vpc_security_group_ids = [aws_security_group.ec2_host_sg.id]
 #   # Ensure the workers are not terminated by accident
 #   disable_api_termination = true
 #   # Tags added to the created Instances
@@ -88,7 +88,7 @@ resource "aws_autoscaling_group" "swarm_managers_asg" {
 #     }
 #   }
 #   iam_instance_profile {
-#     name = "${aws_iam_instance_profile.ec2_profile.name}"
+#     name = aws_iam_instance_profile.ec2_profile.name
 #   }
 #   block_device_mappings {
 #     device_name = "/dev/sda1"
@@ -97,7 +97,7 @@ resource "aws_autoscaling_group" "swarm_managers_asg" {
 #     }
 #   }
 #   # This is used to run on instance initialization
-#   user_data = "${base64encode("${local.swarm_workers_user_data}")}"
+#   user_data = base64encode(local.swarm_workers_user_data)
 # }
 # resource "aws_autoscaling_group" "swarm_workers_asg" {
 #   name                      = "swarm-workers-asg"
@@ -106,10 +106,10 @@ resource "aws_autoscaling_group" "swarm_managers_asg" {
 #   desired_capacity          = 1
 #   health_check_grace_period = 300
 #   force_delete              = false
-#   vpc_zone_identifier       = ["${aws_subnet.private_subnet_1.id}", "${aws_subnet.private_subnet_2.id}"]
-#   target_group_arns         = ["${aws_lb_target_group.ec2_tg.arn}"]
+#   vpc_zone_identifier       = [aws_subnet.private_subnet_1.id, aws_subnet.private_subnet_2.id]
+#   target_group_arns         = [aws_lb_target_group.ec2_tg.arn]
 #   launch_template {
-#     id      = "${aws_launch_template.swarm_workers.id}"
-#     version = "$$Latest"
+#     id      = aws_launch_template.swarm_workers.id
+#     version = "$Latest"
 #   }
 # }

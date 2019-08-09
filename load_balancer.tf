@@ -56,15 +56,15 @@ resource "aws_lb_listener" "port_80_listener" {
 }
 
 # resource "aws_lb_listener" "port_443_listener" {
-#   load_balancer_arn = "${aws_lb.public_lb.arn}"
+#   load_balancer_arn = aws_lb.public_lb.arn
 #   port              = 443
 #   protocol          = "HTTPS"
 #   ssl_policy        = "ELBSecurityPolicy-2016-08"
-#   certificate_arn   = "${aws_acm_certificate.default.arn}"
+#   certificate_arn   = aws_acm_certificate.default.arn
 
 #   default_action {
 #     type             = "forward"
-#     target_group_arn = "${aws_lb_target_group.ec2_tg.arn}"
+#     target_group_arn = aws_lb_target_group.ec2_tg.arn
 #   }
 # }
 
@@ -72,4 +72,3 @@ resource "aws_acm_certificate" "default" {
   domain_name       = var.site_name
   validation_method = "DNS"
 }
-
