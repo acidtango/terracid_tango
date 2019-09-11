@@ -32,6 +32,11 @@ resource "aws_lb_target_group" "ec2_tg" {
   port     = 80
   protocol = "HTTP"
   vpc_id   = aws_vpc.main.id
+
+  health_check {
+    interval = 10
+    healthy_threshold = 3
+  }
 }
 
 resource "aws_lb_listener" "port_80_listener" {
@@ -62,9 +67,3 @@ resource "aws_lb_listener" "port_443_listener" {
     target_group_arn = aws_lb_target_group.ec2_tg.arn
   }
 }
-
-resource "aws_acm_certificate" "default" {
-  domain_name       = var.site_name
-  validation_method = "DNS"
-}
-
