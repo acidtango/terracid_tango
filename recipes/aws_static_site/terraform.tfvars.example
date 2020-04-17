@@ -1,0 +1,7 @@
+# AWS config
+aws_access_key = ""
+aws_secret_key = ""
+aws_region     = "eu-west-1"
+
+# The DNS domain name of the site
+domain = "yourdomain.com"
