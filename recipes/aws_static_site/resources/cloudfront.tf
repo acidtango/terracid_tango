@@ -1,9 +1,10 @@
 resource "aws_cloudfront_distribution" "site" {
+  provider            = aws.main
   enabled             = true
   default_root_object = "index.html"
 
   origin {
-    domain_name = aws_s3_bucket.primary.bucket_domain_name
+    domain_name = aws_s3_bucket.primary.bucket_regional_domain_name
     origin_id   = var.s3_bucket.name
 
     s3_origin_config {
@@ -12,9 +13,7 @@ resource "aws_cloudfront_distribution" "site" {
   }
 
   viewer_certificate {
-    # Use this if your certificate is imported
-    # acm_certificate_arn = data.aws_acm_certificate.default.arn
-    acm_certificate_arn = aws_acm_certificate.default.arn
+    acm_certificate_arn = data.aws_acm_certificate.default.arn
     ssl_support_method  = "sni-only"
   }
 
@@ -37,7 +36,7 @@ resource "aws_cloudfront_distribution" "site" {
   aliases = [var.hostname]
 
   default_cache_behavior {
-    allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
+    allowed_methods  = ["GET", "HEAD", "OPTIONS"]
     cached_methods   = ["GET", "HEAD"]
     target_origin_id = var.s3_bucket.name
 
@@ -49,7 +48,7 @@ resource "aws_cloudfront_distribution" "site" {
       }
     }
 
-    viewer_protocol_policy = "allow-all"
+    viewer_protocol_policy = "redirect-to-https"
     min_ttl                = 0
     default_ttl            = var.cache_default_ttl
     max_ttl                = var.cache_max_ttl
@@ -65,9 +64,11 @@ resource "aws_cloudfront_distribution" "site" {
 }
 
 resource "aws_cloudfront_origin_access_identity" "origin_access_identity" {
-  comment = "Origin Access Identity for S3"
+  provider = aws.main
+  comment  = "Origin Access Identity for S3"
 }
 
-output "cloudfront" {
-  value = aws_cloudfront_distribution.site.domain_name
+output "cloudfront_domain_name" {
+  value       = aws_cloudfront_distribution.site.domain_name
+  description = "Cloudfront domain"
 }

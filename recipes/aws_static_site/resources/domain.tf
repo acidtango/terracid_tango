@@ -1,16 +1,19 @@
 resource "aws_acm_certificate" "default" {
+  provider    = aws.certificate
   domain_name       = "*.${var.domain}"
   validation_method = "DNS"
 }
 
 data "aws_route53_zone" "primary" {
-  name = var.domain
+  provider = aws.main
+  name     = var.domain
 }
 
 resource "aws_route53_record" "site" {
-  zone_id = data.aws_route53_zone.primary.zone_id
-  name    = var.hostname
-  type    = "A"
+  provider = aws.main
+  zone_id  = data.aws_route53_zone.primary.zone_id
+  name     = var.hostname
+  type     = "A"
 
   alias {
     name = aws_cloudfront_distribution.site.domain_name
@@ -26,7 +29,8 @@ resource "aws_route53_record" "site" {
 # configuration in the cloudfront file too
 
 # data "aws_acm_certificate" "default" {
-#   domain   = "*.${var.domain}"
+#   provider    = aws.certificate
+#   domain      = "*.${var.domain}"
 #   most_recent = true
-#   statuses = ["ISSUED"]
+#   statuses    = ["ISSUED"]
 # }

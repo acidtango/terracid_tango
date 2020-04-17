@@ -14,8 +14,10 @@ provider "aws" {
 # automatically, we need to define another provider and use it in our aws_acm_certificate
 # More info: https://github.com/hashicorp/terraform/issues/10957#issuecomment-269653276
 provider "aws" {
+  access_key = var.aws_access_key
+  secret_key = var.aws_secret_key
   region = "us-east-1"
-  alias  = "useast1"
+  alias  = "use1"
 }
 
 # Terraform modules for staging and production environments
@@ -26,6 +28,12 @@ provider "aws" {
 
 #   hostname = "subdomain.${var.domain}"
 #   domain = var.domain
+#
+#   providers = {
+#     aws.main        = aws
+#     aws.certificate = aws.use1
+#   }
+#
 #   s3_bucket = {
 #     name = "your-bucket-name"
 #     tags = {
